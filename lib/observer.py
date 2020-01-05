@@ -13,6 +13,7 @@ from lib.monitor import Monitor
 from lib.utils import log, mediaImport2str, mediaProvider2str
 
 import plex
+from plex.player import Player
 from plex.provider_observer import ProviderObserver
 from plex.server import Server
 
@@ -21,6 +22,7 @@ class PlexObserverService(xbmcmediaimport.Observer):
         super(xbmcmediaimport.Observer, self).__init__()
 
         self._monitor = Monitor()
+        self._player = Player()
         self._observers = {}
 
         self._run()
@@ -44,6 +46,8 @@ class PlexObserverService(xbmcmediaimport.Observer):
         if not mediaProvider:
             raise ValueError('cannot add invalid media provider')
 
+        self._player.AddProvider(mediaProvider)
+
         # check if we already know about the media provider
         mediaProviderId = mediaProvider.getIdentifier()
         if mediaProviderId in self._observers:
@@ -55,6 +59,8 @@ class PlexObserverService(xbmcmediaimport.Observer):
     def _removeObserver(self, mediaProvider):
         if not mediaProvider:
             raise ValueError('cannot remove invalid media provider')
+
+        self._player.RemoveProvider(mediaProvider)
 
         mediaProviderId = mediaProvider.getIdentifier()
         if mediaProviderId not in self._observers:
